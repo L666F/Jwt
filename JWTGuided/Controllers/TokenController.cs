@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -45,9 +46,15 @@ namespace JWTGuided.Controllers
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var claims = new []
+            {
+                new Claim("Username", user.Name),
+                new Claim("Email", user.Email)
+            };
 
             var token = new JwtSecurityToken(_config["Jwt:Issuer"],
               _config["Jwt:Issuer"],
+              claims:claims,
               expires: DateTime.Now.AddMinutes(30),
               signingCredentials: creds);
 
